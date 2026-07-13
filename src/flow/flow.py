@@ -1,14 +1,17 @@
 ## src/flow/flow.py
 ## main.py
 import sys
-from src.utils.utils import (clear_terminal)
+from src.utils.utils import (crear_directorios)
 from src.infra.spark import get_spark
 from src.catalog.catalog_manager import get_catalogo_manager
 from src.catalog.table_manager import TableManager
 from src.catalog.dataframe_manager import DataFrameManager
-clear_terminal()
+
 
 def step_procesar_tabla(spark,table_name):
+    ## --------------------------------- ##
+    crear_directorios()
+    ## --------------------------------- ##
     catalog = get_catalogo_manager()
     df_manager = DataFrameManager(spark)
     ## --------------------------------- ##
