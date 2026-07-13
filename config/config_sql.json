@@ -1,0 +1,65 @@
+{
+"tablas": [
+            {
+                "nombre": "t_resumen_reclamos",
+                "origen":"python",
+                "catalog": "adl_sandbox",
+                "schema": "ext_jcarrion",
+                "python_path": "src.load.load_reclamos",
+                "python_function":"read_parquet_reclamos",
+                "query_sql_path": "",
+                "sql_create_path": "src/sql/ddl/t_resumen_reclamos.sql",
+                "modo": "merge",
+                "partition_by": "Mes",
+                "where":3,
+                "primary_key":["Mes","Clasificacion"],
+                "descripcion": "Resumen de Reclamos"
+            },
+            {
+                "nombre": "t_evolucion_reclamos",
+                "origen":"python",
+                "catalog": "adl_sandbox",
+                "schema": "ext_jcarrion",
+                "python_path": "src.load.load_reclamos",
+                "python_function":"read_parquet_reclamos",
+                "query_sql_path": "",
+                "sql_create_path": "src/sql/ddl/t_evolucion_reclamos.sql",
+                "modo": "merge",
+                "partition_by": "CLUSTER BY AUTO",
+                "where":3,
+                "primary_key":["Mes","Clasificacion"],
+                "descripcion": "Resumen de Reclamos"
+            },
+            {
+                "nombre": "t_detalle_reclamos",
+                "origen":"python",
+                "catalog": "adl_sandbox",
+                "schema": "ext_jcarrion",
+                "python_path": "src.load.load_reclamos",
+                "python_function":"read_parquet_reclamos",
+                "query_sql_path": "",
+                "sql_create_path": "src/sql/ddl/t_detalle_reclamos.sql",
+                "modo": "merge",
+                "partition_by": "CLUSTER BY AUTO",
+                "where":3,
+                "primary_key":["Mes","Clasificacion","OT"],
+                "descripcion": "Resumen de Reclamos"
+            },
+            {
+                "nombre": "t_top_clasificaciones_reclamos",
+                "origen":"python",
+                "catalog": "adl_sandbox",
+                "schema": "ext_jcarrion",
+                "python_path": "src.load.load_reclamos",
+                "python_function":"read_parquet_reclamos",
+                "query_sql_path": "",
+                "sql_create_path": "src/sql/ddl/t_top_clasificaciones_reclamos.sql",
+                "modo": "merge",
+                "partition_by": "CLUSTER BY AUTO",
+                "where":3,
+                "primary_key":["Clasificacion"],
+                "descripcion": "Resumen de Reclamos"
+            }
+          ]
+}
+
