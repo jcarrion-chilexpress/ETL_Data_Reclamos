@@ -156,11 +156,11 @@ def read_sql_file(file_path: str, **kwargs) -> tuple[bool, str]:
 def read_json_file(
     file_path: Path,
     nombre: str | None = None
-    ) -> dict:
+    ) -> tuple[bool,dict|Any]:
     try:
         if not Path(file_path).is_file():
             logger.error("El archivo JSON no existe: %s", file_path)
-            return {}
+            return False,{}
 
         logger.info("El archivo JSON existe: %s",file_path)
         with open(file_path, encoding="utf-8") as file:
@@ -169,18 +169,18 @@ def read_json_file(
         ## Si no se solicita una clave específica,
         ## retorna todo el contenido del JSON.
         if nombre is None:
-            return catalogo
+            return True,catalogo
 
         catalogo_result = catalogo.get(nombre) 
         if catalogo_result is None:
             logger.warning(f'''No existe: {nombre} dentro del catalogo !''')
-            return {}
+            return False,{}
         else:
             logger.info(f'''Catalogo disponible: {nombre} ''')
-            return catalogo_result
+            return True,catalogo_result
 
     except Exception as e:
         logger.exception('Error al leer archivo JSON: %s',e)
-        return {}
+        return False,{}
 
 # -------------------------------------------------- #
