@@ -1,14 +1,11 @@
 ## main.py
 import sys
-from src.utils.utils import (clear_terminal,read_json_file)
 from src.infra.spark import get_spark
 from src.flow.flow import step_procesar_tabla
 from src.transform.consolidado_reclamos import crear_resumen_reclamos
-from src.utils.utils import read_parquet
 from config.config import Settings
 
 settings = Settings()
-clear_terminal()
 
 def main():
     spark = get_spark()
