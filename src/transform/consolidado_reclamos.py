@@ -236,23 +236,23 @@ def generar_dataframes(datos_por_mes: Dict[str, Dict[str, List[Dict[str, Any]]]]
     """Genera DataFrames de pandas con datos agrupados por mes y clasificación."""
     # 1. DataFrame de Resumen General
     logger.info(f'Generando Dataframes')
-    resumen_data = []
-    for mes_key in sorted(datos_por_mes.keys()):
-        datos_mes = datos_por_mes[mes_key]
-        for clasificacion in sorted(datos_mes.keys()):
-            ots = datos_mes[clasificacion]
-            cantidad = len(ots)
-            suma = sum(round(ot.get('valor_declarado', 0),decimales) for ot in ots)
-            promedio = suma / cantidad if cantidad > 0 else 0
-            resumen_data.append({
-                'Mes': mes_key,
-                'Clasificación': clasificacion,
-                'Cantidad': cantidad,
-                'Suma Total (CLP)': round(suma,decimales),
-                'Promedio (CLP)': round(promedio,decimales)
-            })
+    # resumen_data = []
+    # for mes_key in sorted(datos_por_mes.keys()):
+    #     datos_mes = datos_por_mes[mes_key]
+    #     for clasificacion in sorted(datos_mes.keys()):
+    #         ots = datos_mes[clasificacion]
+    #         cantidad = len(ots)
+    #         suma = sum(round(ot.get('valor_declarado', 0),decimales) for ot in ots)
+    #         promedio = suma / cantidad if cantidad > 0 else 0
+    #         resumen_data.append({
+    #             'Mes': mes_key,
+    #             'Clasificación': clasificacion,
+    #             'Cantidad': cantidad,
+    #             'Suma Total (CLP)': round(suma,decimales),
+    #             'Promedio (CLP)': round(promedio,decimales)
+    #         })
     
-    df_resumen = pd.DataFrame(resumen_data)
+    # df_resumen = pd.DataFrame(resumen_data)
     
     # 2. DataFrame de Detalle Completo
     detalle_data = []
@@ -268,10 +268,10 @@ def generar_dataframes(datos_por_mes: Dict[str, Dict[str, List[Dict[str, Any]]]]
                     fecha_str = str(fecha_creacion) if fecha_creacion else 'N/A'                
                 detalle_data.append({
                     'Mes': mes_key,
-                    'Clasificación': clasificacion,
+                    'Clasificacion': clasificacion,
                     'OT': ot_data.get('ot', ''),
-                    'Valor Declarado (CLP)': round(ot_data.get('valor_declarado', 0),decimales),
-                    'Fecha Creación': fecha_str,
+                    'Valor_Declarado_CLP': round(ot_data.get('valor_declarado', 0),decimales),
+                    'Fecha_Creacion': fecha_str,
                     'Usuario': ot_data.get('usuario', 'Sin usuario')
                 })
     

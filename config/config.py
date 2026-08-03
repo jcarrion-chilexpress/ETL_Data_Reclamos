@@ -34,7 +34,7 @@ class Settings(BaseSettings):
     # ==================================================
     # Logging
     # ==================================================
-    archivo_log: str = "ETL_Data_Process_Emilia"
+    archivo_log: str = "Metricas_Gestor_de_Reclamos"
     # ==================================================
     # tabla Process
     # ==================================================
