@@ -232,7 +232,7 @@ def obtener_datos_por_mes(collection) -> Dict[str, Dict[str, List[Dict[str, Any]
     return dict(datos_por_mes)
 
 ############################################
-def generar_dataframes(datos_por_mes: Dict[str, Dict[str, List[Dict[str, Any]]]]) -> Dict[str, pd.DataFrame]:
+def generar_dataframes(datos_por_mes: Dict[str, Dict[str, List[Dict[str, Any]]]]) -> pd.DataFrame:
     """Genera DataFrames de pandas con datos agrupados por mes y clasificación."""
     # 1. DataFrame de Resumen General
     logger.info(f'Generando Dataframes')
@@ -261,6 +261,7 @@ def generar_dataframes(datos_por_mes: Dict[str, Dict[str, List[Dict[str, Any]]]]
         for clasificacion in sorted(datos_mes.keys()):
             for ot_data in datos_mes[clasificacion]:
                 fecha_creacion = ot_data.get('fecha_creacion')
+
                 if fecha_creacion and isinstance(fecha_creacion, datetime):
                     fecha_str = fecha_creacion.strftime('%Y-%m-%d %H:%M:%S')
                 else:
@@ -277,52 +278,54 @@ def generar_dataframes(datos_por_mes: Dict[str, Dict[str, List[Dict[str, Any]]]]
     df_detalle = pd.DataFrame(detalle_data)
     
     # 3. DataFrame de Evolución Mensual por Clasificación
-    evolucion_data = []
-    for mes_key in sorted(datos_por_mes.keys()):
-        datos_mes = datos_por_mes[mes_key]
-        for clasificacion in sorted(datos_mes.keys()):
-            ots = datos_mes[clasificacion]
-            suma = sum(round(ot.get('valor_declarado', 0),decimales) for ot in ots)
-            cantidad = len(ots)
-            evolucion_data.append({
-                'Mes': mes_key,
-                'Clasificación': clasificacion,
-                'Suma Total (CLP)': round(suma,decimales),
-                'Cantidad': round(cantidad,decimales)
-            })
+    # evolucion_data = []
+    # for mes_key in sorted(datos_por_mes.keys()):
+    #     datos_mes = datos_por_mes[mes_key]
+    #     for clasificacion in sorted(datos_mes.keys()):
+    #         ots = datos_mes[clasificacion]
+    #         suma = sum(round(ot.get('valor_declarado', 0),decimales) for ot in ots)
+    #         cantidad = len(ots)
+    #         evolucion_data.append({
+    #             'Mes': mes_key,
+    #             'Clasificación': clasificacion,
+    #             'Suma Total (CLP)': round(suma,decimales),
+    #             'Cantidad': round(cantidad,decimales)
+    #         })
     
-    df_evolucion = pd.DataFrame(evolucion_data)
+    # df_evolucion = pd.DataFrame(evolucion_data)
     
-    # 4. DataFrame de Top Clasificaciones (agregado total)
-    top_data = {}
-    for mes_key, datos_mes in datos_por_mes.items():
-        for clasificacion, ots in datos_mes.items():
-            if clasificacion not in top_data:
-                top_data[clasificacion] = {'suma': 0, 'cantidad': 0}
-            top_data[clasificacion]['suma'] += sum(round(ot.get('valor_declarado', 0),decimales)  for ot in ots)
-            top_data[clasificacion]['cantidad'] += len(ots)
+    # # 4. DataFrame de Top Clasificaciones (agregado total)
+    # top_data = {}
+    # for mes_key, datos_mes in datos_por_mes.items():
+    #     for clasificacion, ots in datos_mes.items():
+    #         if clasificacion not in top_data:
+    #             top_data[clasificacion] = {'suma': 0, 'cantidad': 0}
+    #         top_data[clasificacion]['suma'] += sum(round(ot.get('valor_declarado', 0),decimales)  for ot in ots)
+    #         top_data[clasificacion]['cantidad'] += len(ots)
     
-    top_list = []
-    for clasificacion, datos in top_data.items():
-        promedio = datos['suma'] / datos['cantidad'] if datos['cantidad'] > 0 else 0
-        top_list.append({
-            'Clasificación': clasificacion,
-            'Suma Total (CLP)': round(datos['suma'],decimales),
-            'Cantidad': datos['cantidad'],
-            'Promedio (CLP)': round(promedio,decimales),
-            '_suma_num': datos['suma']  # Para ordenamiento
-        })    
-    df_top = pd.DataFrame(top_list).sort_values('_suma_num', ascending=False).drop(columns=['_suma_num'])
-    return {
-        't_resumen_reclamos': df_resumen,
-        't_detalle_reclamos': df_detalle,
-        't_evolucion_reclamos': df_evolucion,
-        't_top_clasificaciones_reclamos': df_top
-    }
+    # top_list = []
+    # for clasificacion, datos in top_data.items():
+    #     promedio = datos['suma'] / datos['cantidad'] if datos['cantidad'] > 0 else 0
+    #     top_list.append({
+    #         'Clasificación': clasificacion,
+    #         'Suma Total (CLP)': round(datos['suma'],decimales),
+    #         'Cantidad': datos['cantidad'],
+    #         'Promedio (CLP)': round(promedio,decimales),
+    #         '_suma_num': datos['suma']  # Para ordenamiento
+    #     })    
+    # df_top = pd.DataFrame(top_list).sort_values('_suma_num', ascending=False).drop(columns=['_suma_num'])
+
+    return df_detalle
+#  {
+#         't_resumen_reclamos': df_resumen,
+#         't_detalle_reclamos': df_detalle,
+#         't_evolucion_reclamos': df_evolucion,
+#         't_top_clasificaciones_reclamos': df_top
+#     }
 
 
 ############################################
-def crear_resumen_reclamos() -> tuple[bool,list]:
+def crear_resumen_reclamos() -> tuple[bool,pd.DataFrame]:
     """Función principal."""
     logger.info("creando resumenes de reclamos")
 
@@ -331,42 +334,26 @@ def crear_resumen_reclamos() -> tuple[bool,list]:
         logger.info("Clasificaciones excluidas: %s", ", ".join(CLASIFICACIONES_EXCLUIDAS))
     if USUARIOS_EXCLUIDOS:
         logger.info("Usuarios excluidos: %s", ", ".join(USUARIOS_EXCLUIDOS))
+
     logger.info("MODO: Solo primer registro clasificado por OT (evita duplicados cuando cambia clasificación)")
     
     collection = get_mongo_client()
     # Obtener datos agrupados por mes
     logger.info("Obteniendo datos agrupados por mes y clasificación (primer registro por OT)...")
     datos_por_mes = obtener_datos_por_mes(collection)
+
     # Generar DataFrames
     logger.info("Generando DataFrames...")
-    dataframes = generar_dataframes(datos_por_mes)
-
     try:
-        path_archivos = []
-        for df_name,df_value in dataframes.items():
-            msn,path_archivo = save_parquet(df=df_value
-                                            ,file_name = df_name
-                                            ,path_file=settings.reclamos_path
-                                            ,save_csv=False)
-            if msn:
-                path_archivos.append(df_name)
-                logger.info(f"Archivos de reclamos {df_name} creado exitosamente")
+        dataframe_detalle = generar_dataframes(datos_por_mes)        
 
-            else:
-                logger.error(f"Archivos de reclamos {df_name} con error")
-        
-        return True,path_archivos
+        if dataframe_detalle.empty:
+            logger.info(f"Archivos de reclamos creado exitosamente")
+            return False,dataframe_detalle
+
+        return True,dataframe_detalle
     
     except Exception as e:
         logger.error(f'Error creando reclamos {e}')
-        return False,[e]
+        return False,pd.DataFrame()
 
-
-# test = read_json_file(settings.config_path)
-# tablas_dict = test.get('tablas')
-
-# dict_df = {}
-
-# for valor in tablas_dict:
-#     if valor.get('nombre') =='t_resumen_reclamos':
-#         print('OK')

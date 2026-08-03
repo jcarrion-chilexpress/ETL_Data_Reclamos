@@ -10,7 +10,7 @@
                 "query_sql_path": "",
                 "sql_create_path": "src/sql/ddl/t_resumen_reclamos.sql",
                 "modo": "merge",
-                "partition_by": "Mes",
+                "partition_by": "CLUSTER BY AUTO",
                 "where":3,
                 "primary_key":["Mes","Clasificacion"],
                 "descripcion": "Resumen de Reclamos"
@@ -36,7 +36,7 @@
                 "catalog": "adl_sandbox",
                 "schema": "ext_jcarrion",
                 "python_path": "src.load.load_reclamos",
-                "python_function":"read_parquet_reclamos",
+                "python_function":"read_reclamos",
                 "query_sql_path": "",
                 "sql_create_path": "src/sql/ddl/t_detalle_reclamos.sql",
                 "modo": "merge",
